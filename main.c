@@ -13,21 +13,28 @@ draw_function(GtkDrawingArea *area,
               int height,
               gpointer data)
 {
-  GdkRGBA color;
-  GtkStyleContext *context;
+  // * draw cairo primitive: cairo_arc
+  double radius = MIN(width, height) / 2.0; // radius (max radius)
+  // centered circle
+  cairo_arc(cr,                        // cairo renderer
+            width / 2.0, height / 2.0, // position x y (centered)
+            radius,                    // radius (max radius)
+            0, 2 * G_PI);              // full arc is circle (angles: from 0 , to 2*PI )
+  // set color then fill color
+  GdkRGBA circle_color = {.red = 0, .green = 0, .blue = 0, .alpha = 1}; // black (opaque alpha)
+  gdk_cairo_set_source_rgba(cr, &circle_color);                         // set color to fill circle
+  cairo_fill(cr);                                                       // cairo renderer that fills circle (full arc)
 
-  context = gtk_widget_get_style_context(GTK_WIDGET(area));
-
-  cairo_arc(cr,
-            width / 2.0, height / 2.0,
-            MIN(width, height) / 2.0,
-            0, 2 * G_PI);
-
-  gtk_style_context_get_color(context,
-                              &color);
-  gdk_cairo_set_source_rgba(cr, &color);
-
-  cairo_fill(cr);
+  // * draw cairo primitive: cairo_rectangle
+  int size = radius / 3; // radius/3
+  // centered square (even sized rectangle)
+  GdkRectangle square =
+      {.x = width / 2 - size / 2, .y = height / 2 - size / 2, .width = size, .height = size}; // centered and even sized
+  cairo_rectangle(cr, square.x, square.y, square.width, square.height);                       // cairo renderer and xywh
+  // set color then fill color
+  GdkRGBA square_color = {.red = 1, .green = 1, .blue = 0, .alpha = 1}; // yellow (opaque alpha)
+  gdk_cairo_set_source_rgba(cr, &square_color);                         // set color to fill square
+  cairo_fill(cr);                                                       // cairo renderer that fills square (even sized rectangle)                                                                                                // fill square (even sized rectangle)
 }
 
 static void
